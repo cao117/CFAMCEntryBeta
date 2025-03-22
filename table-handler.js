@@ -338,7 +338,7 @@ function switchTab(tabId) {
         // 检查裁判数量是否已设置
         const numberOfJudges = document.getElementById('numberOfJudges').value;
         if (!numberOfJudges || numberOfJudges <= 0) {
-            alert('请先设置裁判数量');
+            alert('Please set # of judges');
             return;
         }
         
@@ -347,14 +347,14 @@ function switchTab(tabId) {
         for (let i = 0; i < judgeRows.length; i++) {
             const judgeName = judgeRows[i].getElementsByTagName('td')[1].querySelector('input').value;
             if (!judgeName) {
-                alert(`请先完成第${i+1}个裁判的信息填写`);
+                alert(`Please fill the name of judge #${i+1}`);
                 return;
             }
             
             // 检查裁判缩写
             const judgeAcronym = judgeRows[i].getElementsByTagName('td')[2].querySelector('input').value;
             if (!judgeAcronym) {
-                alert(`请先完成第${i+1}个裁判的缩写填写`);
+                alert(`Plase fill the acronym of judge #${i+1}`);
                 return;
             }
         }

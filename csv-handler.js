@@ -195,7 +195,7 @@ function validateAndNavigate() {
     const showDate = document.getElementById('showDate').value;
     if (!showDate) {
         switchTab('general');
-        alert('请输入Show Date');
+        alert('Please Enter Show Date');
         document.getElementById('showDate').focus();
         return false;
     }
@@ -203,14 +203,14 @@ function validateAndNavigate() {
     const clubName = document.getElementById('clubName').value;
     if (!clubName) {
         switchTab('general');
-        alert('请输入Club Name');
+        alert('Please Enter Club Name');
         document.getElementById('clubName').focus();
         return false;
     }
     
     if (clubName.length > 255) {
         switchTab('general');
-        alert('Club Name不能超过255个字符');
+        alert('Club Name Cannot Exceed 255 Characters');
         document.getElementById('clubName').focus();
         return false;
     }
@@ -218,14 +218,14 @@ function validateAndNavigate() {
     const masterClerkName = document.getElementById('masterClerkName').value;
     if (!masterClerkName) {
         switchTab('general');
-        alert('请输入Master Clerk Name');
+        alert('Please Enter Master Clerk Name');
         document.getElementById('masterClerkName').focus();
         return false;
     }
     
     if (masterClerkName.length > 120) {
         switchTab('general');
-        alert('Master Clerk Name不能超过120个字符');
+        alert('Master Clerk Name Cannot Exceed 120 Characters');
         document.getElementById('masterClerkName').focus();
         return false;
     }
@@ -233,7 +233,7 @@ function validateAndNavigate() {
     const numberOfJudges = document.getElementById('numberOfJudges').value;
     if (!numberOfJudges || numberOfJudges <= 0) {
         switchTab('general');
-        alert('请设置裁判数量');
+        alert('Please Set # of Judges');
         document.getElementById('numberOfJudges').focus();
         return false;
     }
@@ -245,14 +245,14 @@ function validateAndNavigate() {
         const judgeName = judgeRows[i].getElementsByTagName('td')[1].querySelector('input').value;
         if (!judgeName) {
             switchTab('general');
-            alert(`请输入第${i+1}个裁判的姓名`);
+            alert(`Please Enter Name of  Judge #${i+1}`);
             judgeRows[i].getElementsByTagName('td')[1].querySelector('input').focus();
             return false;
         }
         
         if (judgeName.length > 120) {
             switchTab('general');
-            alert(`第${i+1}个裁判的姓名不能超过120个字符`);
+            alert(`Name of Judge #${i+1} Cannot Exceed 120 Characters`);
             judgeRows[i].getElementsByTagName('td')[1].querySelector('input').focus();
             return false;
         }
@@ -261,14 +261,14 @@ function validateAndNavigate() {
         const judgeAcronym = judgeRows[i].getElementsByTagName('td')[2].querySelector('input').value;
         if (!judgeAcronym) {
             switchTab('general');
-            alert(`请输入第${i+1}个裁判的缩写`);
+            alert(`Please Enter Acronym of Judge #${i+1}`);
             judgeRows[i].getElementsByTagName('td')[2].querySelector('input').focus();
             return false;
         }
         
         if (judgeAcronym.length > 6) {
             switchTab('general');
-            alert(`第${i+1}个裁判的缩写不能超过6个字符`);
+            alert(`Acronym of Judge #${i+1} Cannot Exceed 6 Characters`);
             judgeRows[i].getElementsByTagName('td')[2].querySelector('input').focus();
             return false;
         }
@@ -450,7 +450,7 @@ function validateFinalsGroup(values, tabId, colIndex, ringNumber, judgeName, gro
         // 验证是否是1-450之间的整数
         if (!/^\d+$/.test(value)) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的${groupName}第${valueObj.position}名输入值"${value}"必须是1-450之间的整数或void`);
+            alert(`Cat # Entered for Ring #${ringNumber} Under Judge (${judgeName}) Group #${groupName} Position #${valueObj.position} was "${value}", but It Must be a Number Between 1-450 or void`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -458,7 +458,7 @@ function validateFinalsGroup(values, tabId, colIndex, ringNumber, judgeName, gro
         const numValue = parseInt(value, 10);
         if (numValue < 1 || numValue > 450) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的${groupName}第${valueObj.position}名输入值${numValue}必须在1-450之间`);
+            alert(`Cat # Entered for Ring #${ringNumber} Under Judge (${judgeName}) Group #${groupName} Position #${valueObj.position} was "${value}", but It Must be a Number between 1-450`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -467,7 +467,7 @@ function validateFinalsGroup(values, tabId, colIndex, ringNumber, judgeName, gro
         for (let j = 0; j < i; j++) {
             if (!values[j].value) {
                 switchTab(tabId);
-                alert(`环号${ringNumber}(${judgeName})的${groupName}第${valueObj.position}名有值，但第${j+1}名为空，请按顺序填写`);
+                alert(`Cat # Entered for Ring#${ringNumber} Under Judge (${judgeName}) Group #${groupName} Position #${valueObj.position} , but Previous Row #${j+1} was empty, Please Complete`);
                 highlightElement(values[j].element);
                 return false;
             }
@@ -476,7 +476,7 @@ function validateFinalsGroup(values, tabId, colIndex, ringNumber, judgeName, gro
         // 检查重复数字
         if (usedNumbers.has(numValue)) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的${groupName}第${valueObj.position}名输入值${numValue}在${groupName}组中已使用过，不能重复`);
+            alert(`Duplicate Cat #  ${numValue} was Entered for Ring #${ringNumber} Under Judge(${judgeName}) Group #${groupName} Postion #${valueObj.position}`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -514,7 +514,7 @@ function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
         // 验证是否是1-450之间的整数
         if (!/^\d+$/.test(value)) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的第${valueObj.position}名输入值"${value}"必须是1-450之间的整数或void`);
+            alert(`Cat # entered for Ring #${ringNumber} Under Judge (${judgeName})  Position #${valueObj.position} was "${value}", but it must be a number between 1-450 or void`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -522,7 +522,7 @@ function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
         const numValue = parseInt(value, 10);
         if (numValue < 1 || numValue > 450) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的第${valueObj.position}名输入值${numValue}必须在1-450之间`);
+            alert(`Cat # entered for Ring #${ringNumber} Under Judge (${judgeName})  Position #${valueObj.position} was "${value}", but it must be a number between 1-450`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -531,7 +531,7 @@ function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
         for (let j = 0; j < i; j++) {
             if (!values[j].value) {
                 switchTab(tabId);
-                alert(`环号${ringNumber}(${judgeName})的第${valueObj.position}名有值，但第${values[j].position}名为空，请按顺序填写`);
+                alert(`Cat # Entered for Ring #${ringNumber} Under Judge(${judgeName}) Position ${valueObj.position}，but Previous Row #${values[j].position} Was Not Filled, Please Complete`);
                 highlightElement(values[j].element);
                 return false;
             }
@@ -540,7 +540,7 @@ function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
         // 检查重复数字
         if (usedNumbers.has(numValue)) {
             switchTab(tabId);
-            alert(`环号${ringNumber}(${judgeName})的第${valueObj.position}名输入值${numValue}已经在前面使用过，不能重复`);
+            alert(`Duplicate Cat # ${numValue} for Ring #${ringNumber} Under Judge (${judgeName}) Postition #${valueObj.position}`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -902,7 +902,7 @@ function validateInputOnBlur(event) {
             const prevInput = rows[i].querySelectorAll('input')[colIndex];
             if (!prevInput || !prevInput.value.trim()) {
                 input.style.backgroundColor = '#ffcccc';
-                input.title = `第${rowIndex-2}名有值，但第${i-2}名为空，请按顺序填写`;
+                input.title = `Row #${rowIndex-2} was Filled, but Previous Row #${i-2} was not Filled, Please Complete`;
                 return;
             }
         }
@@ -925,7 +925,7 @@ function validateInputOnBlur(event) {
         // 检查当前数字是否重复
         if (usedNumbers.has(numValue)) {
             input.style.backgroundColor = '#ffcccc';
-            input.title = `输入值${numValue}已经在其他行使用过，不能重复`;
+            input.title = `Duplicate Cat # ${numValue} Entered`;
             return;
         }
     } else {

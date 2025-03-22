@@ -6,9 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="orientation" content="landscape">
-    <title>CFA Master Clerk Entry Beta Test</title>
+    <title>CFA Master Clerk Entry Alpha 1.0  </title>
     <style>
         body {
+		    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Importing Roboto font */
             font-family: Roboto, Arial, sans-serif;
             margin: 20px;
             min-width: 1024px;
@@ -160,6 +161,19 @@
         input[type="checkbox"] {
             transform: scale(1.3);
         }
+		h1 {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: relative;
+		}	
+		.cfa-logo {
+			position: absolute;
+			left: 0;
+			width: auto; /* Adjust the width as needed */
+			height: auto;
+			align: right;
+		}
 
     </style>
     <!-- 测试数据脚本，生产环境可移除 -->
@@ -178,7 +192,7 @@
 <div class="landscape-only">
 <form onsubmit="return saveToTempCSV()" class="form-container">
     <div class="container">
-        <h1>CFA Master Clerk Entry Beta Test</h1>
+       <h1><img src="./CFA_logo_tmp.png" alt="CFA Logo" class="cfa-logo">CFA Master Clerk Entry Alpha 1.0</h1>
 
         <!-- Tabs for Navigation -->
         <div class="tab-buttons">
@@ -267,8 +281,9 @@
         <div class="button-container">
             <button id="restoreCSVButton" type="button" onclick="restoreFromCSV()">Restore from CSV</button>    
             <input type="submit" value="Save to Temp CSV" class="button-class">
-            <button type="button" onclick="generateFinalCSV()" style="margin-left: 10px; background-color: #007bff; color: white;">Generate Final CSV</button>
-            <button type="button" id="testDataButton" onclick="fillTestData()" style="margin-left: 10px; background-color: #28a745;">快速填充测试数据</button>
+            <button type="button" onclick="generateFinalCSV()" >Generate Final CSV</button>
+			<button type="button" onclick="location.reload()">Reset</button>
+            <button type="button" id="testDataButton" onclick="fillTestData()" style="margin-left: 10px; background-color: red;">Data Test Only!</button>
         </div>
     </div>
 </form>
