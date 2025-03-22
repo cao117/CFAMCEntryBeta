@@ -1,0 +1,59 @@
+/**
+ * 生成冠军组、幼猫组和绝育组表格的行
+ * @param {HTMLElement} tableBody - 表格体元素
+ * @param {number} rows - 行数
+ * @param {Array} rowHeaders - 行标题数组
+ * @param {number} totalColumns - 总列数
+ */
+function generateTableRows(tableBody, rows, rowHeaders, totalColumns) {
+    // 清空表格内容
+    tableBody.innerHTML = '';
+    console.log(`为 ${tableBody.id} 生成 ${rows} 行，${totalColumns} 列`);
+    
+    for (let i = 0; i < rows; i++) {
+        const row = document.createElement('tr');
+        
+        // Row header in the first column
+        const headerCell = document.createElement('td');
+        headerCell.textContent = rowHeaders[i];
+        row.appendChild(headerCell);
+
+        // Add dynamic columns for the judges and type
+        for (let j = 0; j < totalColumns; j++) {
+            const judgeCell = document.createElement('td');
+            const judgeInput = document.createElement('input');
+            judgeInput.type = 'text';
+            judgeInput.setAttribute('data-col', j);
+            judgeInput.setAttribute('data-row', i);
+            
+            switch (headerCell.textContent) {
+                case 'Ring #':
+                    judgeInput.classList.add('ring' + j);
+                    break;
+                case 'Judge':
+                    judgeInput.classList.add('judge' + j);
+                    break;
+                case 'Type':
+                    judgeInput.classList.add('type' + j);
+                    break;
+            }
+            
+            // 为所有输入框添加blur事件监听器，包括1-15名和决赛行
+            judgeInput.addEventListener('blur', function(e) {
+                console.log(`输入框失去焦点: 表格=${tableBody.id}, 行=${i}, 列=${j}, 值=${this.value}`);
+                validateInputOnBlur(e);
+            });
+            judgeInput.setAttribute('data-has-validator', 'true');
+            
+            judgeCell.appendChild(judgeInput);
+            row.appendChild(judgeCell);
+        }
+
+        tableBody.appendChild(row);
+    }
+    
+    console.log(`${tableBody.id} 表格生成完成`);
+    
+    // 触发自定义事件，通知表格已更新
+    document.dispatchEvent(tableUpdatedEvent);
+} 

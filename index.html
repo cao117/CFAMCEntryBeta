@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="orientation" content="landscape">
+    <title>CFA Master Clerk Entry Beta Test</title>
+    <style>
+        body {
+            font-family: Roboto, Arial, sans-serif;
+            margin: 20px;
+            min-width: 1024px;
+            -webkit-text-size-adjust: 100%;
+			background-color: #ffffff; /* White background */
+			color: #000000; /* Black text */
+        }
+
+        /* 禁止iPad竖屏模式的提示 */
+        @media screen and (orientation: portrait) {
+            .landscape-only {
+                display: none;
+            }
+            .rotate-message {
+                display: flex;
+                height: 100vh;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                font-size: 24px;
+                color: #007BFF;
+            }
+        }
+
+        @media screen and (orientation: landscape) {
+            .rotate-message {
+                display: none;
+            }
+            .landscape-only {
+                display: block;
+            }
+        }
+
+        .container {
+            width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-buttons {
+            display: flex;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons div {
+            padding: 15px 20px; /* 增大按钮区域 */
+			background-color: #C5B358; /* CFA Gold */
+		    color: #000000; /* Black text */
+            margin-right: 5px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+
+        .tab-buttons div:hover {
+            background-color: #B89B3F; /* Darker CFA Gold for hover */
+        }
+
+        .tab-buttons .active {
+			background-color: #000000; /* Black for active tab */
+			color: #C5B358; /* CFA Gold text for active tab */
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .active-tab {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 1200px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed; /* 固定表格布局 */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+			background-color: #f9f9f9; /* Light gray background for table cells */
+            padding: 8px; /* 增大单元格内边距 */
+            text-align: left;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+		
+		th {
+			background-color: #000000; /* Black for table headers */
+			color: white; /* White text for headers */
+			text-align: left;
+		}
+
+        /* 第一列（标题列）的宽度 */
+        table tr td:first-child {
+            width: 120px;
+        }
+
+        /* 其他列的宽度将自动等分 */
+        
+        select, input[type="text"], input[type="number"], input[type="date"] {
+            padding: 10px; /* 增大输入区域内边距 */
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px; /* 防止iOS自动缩放 */
+            margin: 0;
+        }
+
+        button, .button-class {
+            padding: 12px 20px; /* 增大按钮尺寸 */
+            background-color: #C5B358; /* CFA Gold */
+		    color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        button:hover, .button-class:hover {
+            background-color: #003366; /* Darker CFA Blue for hover */
+        }
+
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            text-align: left;
+        }
+
+        /* 必填字段标记 */
+        .required-field::after {
+            content: " *";
+            color: red;
+            font-weight: bold;
+        }
+
+        /* 针对触摸优化的样式 */
+        input[type="checkbox"] {
+            transform: scale(1.3);
+        }
+
+    </style>
+    <!-- 测试数据脚本，生产环境可移除 -->
+    <script src="test-data.js"></script>
+    <!-- CSV处理脚本 -->
+    <script src="csv-handler.js"></script>
+    <!-- 表单验证脚本 -->
+    <script src="form-validation.js"></script>
+    <!-- 表格处理脚本 -->
+    <script src="table-handler.js"></script>
+</head>
+<body>
+<div class="rotate-message">
+    请将设备旋转到横屏模式使用此应用
+</div>
+<div class="landscape-only">
+<form onsubmit="return saveToTempCSV()" class="form-container">
+    <div class="container">
+        <h1>CFA Master Clerk Entry Beta Test</h1>
+
+        <!-- Tabs for Navigation -->
+        <div class="tab-buttons">
+            <div class="tab active" onclick="switchTab('general')">General</div>
+            <div class="tab" onclick="switchTab('championship')">Championship</div>
+            <div class="tab" onclick="switchTab('kitten')">Kitten</div>
+            <div class="tab" onclick="switchTab('premiership')">Premiership</div>
+        </div>
+
+        <!-- Tab content -->
+        <div id="general" class="tab-content active-tab">
+            <h2>General Info:</h2>
+            <p class="required-note"><span style="color: red;">*</span> Required</p>
+            <table>
+                <tr>
+                    <td><label for="showDate" class="required-field">Show Date:</label></td>
+                    <td><input type="date" id="showDate"></td>
+                </tr>
+                <tr>
+                    <td><label for="clubName" class="required-field">Club Name:</label></td>
+                    <td><input type="text" id="clubName" maxlength="255"></td>
+                </tr>
+                <tr>
+                    <td><label for="masterClerkName" class="required-field">Master Clerk Name:</label></td>
+                    <td><input type="text" id="masterClerkName" maxlength="120"></td>
+                </tr>
+                <tr>
+                    <td><label for="numberOfJudges" class="required-field"># of Judges:</label></td>
+                    <td><input type="number" id="numberOfJudges" min="1" max="12" onchange="updateJudgeInformation()" onkeyup=enforceMinMax(this)></td>
+                </tr>
+            </table>
+
+            <!-- Judge Information Section -->
+            <h2>Judge Information:</h2>
+            <div class="table-container">
+                <table id="judgeInfoTable">
+                    <thead id="judgeInfoTableHead" style="display: none;">
+                        <tr>
+                            <th>#</th>
+                            <th class="required-field">Judge Name</th>
+                            <th>Judge Acronym</th>
+                            <th>Ring Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be generated based on the # of Judges input -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="championship" class="tab-content">
+            <h2>Championship Finals</h2>
+            <div class="table-container">
+                <table id="championshipTable">
+                    <tbody id="championshipTableBody">
+                        <!-- Rows will be dynamically generated based on the number of judges -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="kitten" class="tab-content">
+            <h2>Kitten Finals</h2>
+            <div class="table-container">
+                <table id="kittenTable">
+                    <tbody id="kittenTableBody">
+                        <!-- Rows will be dynamically generated based on the number of judges -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="premiership" class="tab-content">
+            <h2>Premiership Finals</h2>
+            <!-- Premiership Table (same structure as Championship and Kitten) -->
+            <div class="table-container">
+                <table id="premiershipTable">
+                    <tbody id="premiershipTableBody">
+                        <!-- Rows will be dynamically generated based on the number of judges -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Generate CSV Button (Persistent across all tabs) -->
+        <div class="button-container">
+            <button id="restoreCSVButton" type="button" onclick="restoreFromCSV()">Restore from CSV</button>    
+            <input type="submit" value="Save to Temp CSV" class="button-class">
+            <button type="button" onclick="generateFinalCSV()" style="margin-left: 10px; background-color: #007bff; color: white;">Generate Final CSV</button>
+            <button type="button" id="testDataButton" onclick="fillTestData()" style="margin-left: 10px; background-color: #28a745;">快速填充测试数据</button>
+        </div>
+    </div>
+</form>
+</div>
+<script src="jquery.js"></script>
+<script type="text/javascript">
+    // 环境配置
+    const IS_DEVELOPMENT = true; // 设置为false将隐藏测试按钮
+    
+    // 在DOM加载完成后，根据环境配置隐藏/显示测试按钮
+    document.addEventListener('DOMContentLoaded', function() {
+        const testButton = document.getElementById('testDataButton');
+        if (testButton && !IS_DEVELOPMENT) {
+            testButton.style.display = 'none';
+        }
+    });
+
+    // 创建自定义事件，用于在表格更新后重新设置验证
+    const tableUpdatedEvent = new Event('tableUpdated');
+
+    // 填充表格基本信息
+    function fillBaseInfo() {
+        const numJudges = parseInt(document.getElementById('numberOfJudges').value) || 0;
+        
+        // 获取Judge信息表格中的裁判信息
+        const judgeTable = document.getElementById('judgeInfoTable');
+        const judgeRows = judgeTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        // 获取裁判信息数组
+        const judges = [];
+        for (let i = 0; i < judgeRows.length; i++) {
+            const cells = judgeRows[i].getElementsByTagName('td');
+            if (cells.length >= 4) {
+                const judgeName = cells[1].querySelector('input').value;
+                const judgeAcronym = cells[2].querySelector('input').value;
+                const ringType = cells[3].querySelector('select').value;
+                
+                judges.push({
+                    name: judgeName,
+                    acronym: judgeAcronym,
+                    type: ringType
+                });
+            }
+        }
+        
+        // 填充Championship表格
+        fillTableBaseInfo('championshipTableBody', judges);
+        
+        // 填充Kitten表格
+        fillTableBaseInfo('kittenTableBody', judges);
+        
+        // 填充Premiership表格
+        fillTableBaseInfo('premiershipTableBody', judges);
+        
+        // 触发表格更新事件
+        document.dispatchEvent(tableUpdatedEvent);
+    }
+
+    // 更新裁判信息表格
+    function updateJudgeInformation() {
+        const numJudges = parseInt(document.getElementById('numberOfJudges').value) || 0;
+        const table = document.getElementById('judgeInfoTable').getElementsByTagName('tbody')[0];
+        
+        // 清空表格
+        table.innerHTML = '';
+        
+        // 添加裁判行
+        for (let i = 0; i < numJudges; i++) {
+            const row = table.insertRow();
+            
+            // 序号单元格
+            const cellNum = row.insertCell();
+            cellNum.textContent = i + 1;
+            
+            // 裁判姓名单元格
+            const cellName = row.insertCell();
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'form-control';
+            nameInput.setAttribute('placeholder', 'Judge ' + (i + 1) + ' Name');
+            cellName.appendChild(nameInput);
+            
+            // 裁判缩写单元格
+            const cellAcronym = row.insertCell();
+            const acronymInput = document.createElement('input');
+            acronymInput.type = 'text';
+            acronymInput.className = 'form-control';
+            acronymInput.setAttribute('placeholder', 'Acronym');
+            cellAcronym.appendChild(acronymInput);
+            
+            // 环类型单元格
+            const cellType = row.insertCell();
+            const typeSelect = document.createElement('select');
+            typeSelect.className = 'form-control';
+            
+            const options = ['Allbreed', 'Longhair', 'Shorthair', 'Double Specialty'];
+            for (const option of options) {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                typeSelect.appendChild(optElement);
+            }
+            
+            cellType.appendChild(typeSelect);
+        }
+        
+        // 重置表格数据
+        document.getElementById('championshipTableBody').innerHTML = '';
+        document.getElementById('kittenTableBody').innerHTML = '';
+        document.getElementById('premiershipTableBody').innerHTML = '';
+        
+        // 在函数最后触发表格更新事件
+        setTimeout(function() {
+            document.dispatchEvent(tableUpdatedEvent);
+        }, 100);
+    }
+
+    // 添加iPad检测功能
+    function isiPad() {
+        return navigator.userAgent.match(/iPad/i) || 
+               (navigator.userAgent.match(/Mac/i) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+    }
+
+    // 在文档加载完成后应用iPad特定样式
+    document.addEventListener('DOMContentLoaded', function() {
+        if(isiPad()) {
+            document.body.classList.add('ipad-device');
+            // 应用特定于iPad的增强样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .ipad-device .table-container {
+                    -webkit-overflow-scrolling: touch;
+                }
+                .ipad-device select, 
+                .ipad-device input[type="text"], 
+                .ipad-device input[type="number"], 
+                .ipad-device input[type="date"] {
+                    font-size: 16px;
+                }
+                .ipad-device button, 
+                .ipad-device .button-class {
+                    margin: 8px;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    });
+</script>
+
+</body>
+</html>
