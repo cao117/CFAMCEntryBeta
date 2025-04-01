@@ -252,6 +252,10 @@ function updateJudgeInformation() {
  * @param {number} totalColumns - 总列数
  */
 function generateTableRows(tableBody, rows, rowHeaders, totalColumns) {
+    // 清空表格内容
+    tableBody.innerHTML = '';
+    console.log(`为 ${tableBody.id} 生成 ${rows} 行，${totalColumns} 列`);
+    
     for (let i = 0; i < rows; i++) {
         const row = document.createElement('tr');
         
@@ -263,25 +267,187 @@ function generateTableRows(tableBody, rows, rowHeaders, totalColumns) {
         // Add dynamic columns for the judges and type
         for (let j = 0; j < totalColumns; j++) {
             const judgeCell = document.createElement('td');
-            const judgeInput = document.createElement('input');
-            judgeInput.type = 'text';
-            switch (headerCell.textContent) {
-                case 'Ring #':
-                    judgeInput.classList.add('ring' + j);
-                    break;
-                case 'Judge':
-                    judgeInput.classList.add('judge' + j);
-                    break;
-                case 'Type':
-                    judgeInput.classList.add('type' + j);
-                    break;
+            
+            // 判断是否为Championship表格的1-15名选手行(对应索引3-17)
+            const isChampionshipTable = tableBody.id === 'championshipTableBody';
+            const isPremiershipTable = tableBody.id === 'premiershipTableBody';
+            const isTop15Row = (isChampionshipTable || isPremiershipTable) && i >= 3 && i <= 17;
+            
+            if (isTop15Row) {
+                // 为1-15名创建包含输入框和下拉菜单的容器
+                const container = document.createElement('div');
+                container.className = 'input-select-container';
+                
+                // 创建猫编号输入框
+                const judgeInput = document.createElement('input');
+                judgeInput.type = 'text';
+                judgeInput.className = 'cat-number-input';
+                judgeInput.setAttribute('data-col', j);
+                judgeInput.setAttribute('data-row', i);
+                
+                // 创建状态下拉菜单
+                const statusSelect = document.createElement('select');
+                statusSelect.className = 'cat-status-select';
+                statusSelect.setAttribute('data-col', j);
+                statusSelect.setAttribute('data-row', i);
+                
+                // 根据表格类型添加不同的下拉选项
+                if (isChampionshipTable) {
+                    // Championship表格使用GC、CH、NOV选项
+                    const gcOption = document.createElement('option');
+                    gcOption.value = 'GC';
+                    gcOption.textContent = 'GC';
+                    statusSelect.appendChild(gcOption);
+                    
+                    const chOption = document.createElement('option');
+                    chOption.value = 'CH';
+                    chOption.textContent = 'CH';
+                    statusSelect.appendChild(chOption);
+                    
+                    const novOption = document.createElement('option');
+                    novOption.value = 'NOV';
+                    novOption.textContent = 'NOV';
+                    statusSelect.appendChild(novOption);
+                    
+                    // 默认选中GC
+                    statusSelect.value = 'GC';
+                } else if (isPremiershipTable) {
+                    // Premiership表格使用GP、PR、NOV选项
+                    const gpOption = document.createElement('option');
+                    gpOption.value = 'GP';
+                    gpOption.textContent = 'GP';
+                    statusSelect.appendChild(gpOption);
+                    
+                    const prOption = document.createElement('option');
+                    prOption.value = 'PR';
+                    prOption.textContent = 'PR';
+                    statusSelect.appendChild(prOption);
+                    
+                    const novOption = document.createElement('option');
+                    novOption.value = 'NOV';
+                    novOption.textContent = 'NOV';
+                    statusSelect.appendChild(novOption);
+                    
+                    // 默认选中GP
+                    statusSelect.value = 'GP';
+                }
+                
+                // 设置select事件，让状态变化时更新样式
+                statusSelect.addEventListener('change', function() {
+                    // 保持金色背景
+                    this.style.backgroundColor = '#C5B358';
+                    
+                    // 获取当前状态值
+                    const status = this.value;
+                    
+                    // 如果是Championship表格且状态变为CH，触发相关验证
+                    if (isChampionshipTable && status === 'CH') {
+                        // 获取对应的猫编号输入框
+                        const catNumberInput = this.closest('.input-select-container').querySelector('.cat-number-input');
+                        if (catNumberInput && catNumberInput.value.trim()) {
+                            // 触发猫编号输入框的blur事件，以执行验证
+                            const blurEvent = new Event('blur');
+                            catNumberInput.dispatchEvent(blurEvent);
+                            
+                            // 如果是前15行的CH猫，可能需要更新Best CH系列
+                            const row = this.closest('tr');
+                            const tbody = row.closest('tbody');
+                            const rows = tbody.getElementsByTagName('tr');
+                            
+                            // 找出当前行在表格中的索引
+                            let rowIndex = -1;
+                            for (let i = 0; i < rows.length; i++) {
+                                if (rows[i] === row) {
+                                    rowIndex = i;
+                                    break;
+                                }
+                            }
+                            
+                            // 如果是前15行，且输入了有效的猫编号
+                            if (rowIndex >= 3 && rowIndex <= 17 && catNumberInput.value.trim()) {
+                                // 触发Best CH系列中猫编号输入框的验证
+                                for (let i = 18; i <= 22; i++) {
+                                    if (i < rows.length) {
+                                        const bestCHInput = rows[i].querySelectorAll('input')[parseInt(this.getAttribute('data-col'))];
+                                        if (bestCHInput && bestCHInput.value.trim()) {
+                                            const blurEvent = new Event('blur');
+                                            bestCHInput.dispatchEvent(blurEvent);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 根据行标题设置类名
+                switch (headerCell.textContent) {
+                    case 'Ring #':
+                        judgeInput.classList.add('ring' + j);
+                        break;
+                    case 'Judge':
+                        judgeInput.classList.add('judge' + j);
+                        break;
+                    case 'Type':
+                        judgeInput.classList.add('type' + j);
+                        break;
+                    default:
+                        judgeInput.classList.add('entry' + j);
+                        break;
+                }
+                
+                // 为输入框添加blur事件监听器
+                judgeInput.addEventListener('blur', function(e) {
+                    console.log(`输入框失去焦点: 表格=${tableBody.id}, 行=${i}, 列=${j}, 值=${this.value}`);
+                    validateInputOnBlur(e);
+                });
+                judgeInput.setAttribute('data-has-validator', 'true');
+                
+                // 将输入框和下拉菜单添加到容器
+                container.appendChild(judgeInput);
+                container.appendChild(statusSelect);
+                
+                // 将容器添加到单元格
+                judgeCell.appendChild(container);
+            } else {
+                // 其他行仍然只使用普通输入框
+                const judgeInput = document.createElement('input');
+                judgeInput.type = 'text';
+                judgeInput.setAttribute('data-col', j);
+                judgeInput.setAttribute('data-row', i);
+                
+                switch (headerCell.textContent) {
+                    case 'Ring #':
+                        judgeInput.classList.add('ring' + j);
+                        break;
+                    case 'Judge':
+                        judgeInput.classList.add('judge' + j);
+                        break;
+                    case 'Type':
+                        judgeInput.classList.add('type' + j);
+                        break;
+                }
+                
+                // 为所有输入框添加blur事件监听器，包括1-15名和决赛行
+                judgeInput.addEventListener('blur', function(e) {
+                    console.log(`输入框失去焦点: 表格=${tableBody.id}, 行=${i}, 列=${j}, 值=${this.value}`);
+                    validateInputOnBlur(e);
+                });
+                judgeInput.setAttribute('data-has-validator', 'true');
+                
+                judgeCell.appendChild(judgeInput);
             }
-            judgeCell.appendChild(judgeInput);
+            
             row.appendChild(judgeCell);
         }
 
         tableBody.appendChild(row);
     }
+    
+    console.log(`${tableBody.id} 表格生成完成`);
+    
+    // 触发自定义事件，通知表格已更新
+    document.dispatchEvent(tableUpdatedEvent);
 }
 
 /**

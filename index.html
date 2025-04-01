@@ -103,6 +103,8 @@
             padding: 8px; /* 增大单元格内边距 */
             text-align: left;
             overflow: hidden; /* 防止内容溢出 */
+            height: 40px; /* 固定单元格高度 */
+            box-sizing: border-box; /* 确保内边距不会增加单元格实际大小 */
         }
 		
 		th {
@@ -119,11 +121,27 @@
         /* 其他列的宽度将自动等分 */
         
         select, input[type="text"], input[type="number"], input[type="date"] {
-            padding: 10px; /* 增大输入区域内边距 */
+            padding: 8px; /* 统一所有输入控件的内边距 */
             width: 100%;
             box-sizing: border-box;
             font-size: 16px; /* 防止iOS自动缩放 */
             margin: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none; /* 移除点击时的轮廓线 */
+            height: 36px; /* 统一高度 */
+        }
+        
+        /* 聚焦时的样式 */
+        select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus {
+            border-color: #C5B358; /* 聚焦时边框变为金色 */
+            box-shadow: 0 0 3px rgba(197, 179, 88, 0.3); /* 添加微弱的阴影 */
+        }
+        
+        /* 禁用时的样式 */
+        select[readonly], input[readonly] {
+            background-color: #f9f9f9;
+            cursor: not-allowed;
         }
 
         button, .button-class {
@@ -174,6 +192,80 @@
 			height: auto;
 			align: right;
 		}
+        
+        /* 输入框和下拉菜单组合控件样式 */
+        .input-select-container {
+            display: flex;
+            align-items: stretch; /* 确保高度匹配 */
+            width: 100%;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden; /* 确保内部元素不会溢出边框 */
+            height: 36px; /* 设置固定高度与其他输入框一致 */
+            box-sizing: border-box;
+        }
+        
+        /* 组合控件里面的输入框无需单独的边框 */
+        .input-select-container .cat-number-input {
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        
+        /* 聚焦时整个容器的样式 */
+        .input-select-container:focus-within {
+            border-color: #C5B358; /* 聚焦时边框变为金色 */
+            box-shadow: 0 0 3px rgba(197, 179, 88, 0.3); /* 添加微弱的阴影 */
+        }
+        
+        .cat-number-input {
+            flex: 1;
+            min-width: 65%;
+            margin: 0;
+            padding: 8px;
+            border: none; /* 移除输入框边框 */
+            outline: none; /* 移除点击时的轮廓线 */
+            height: 100%;
+        }
+        
+        .cat-status-select {
+            width: 35%;
+            padding: 0;
+            background-color: #C5B358; /* 金色背景 */
+            color: black;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            border: none; /* 移除下拉菜单边框 */
+            outline: none; /* 移除点击时的轮廓线 */
+            -webkit-appearance: none; /* 去除默认下拉箭头 */
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer; /* 添加指针样式提示可点击 */
+            border-left: 1px solid #ddd;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 设置下拉选项的样式 */
+        .cat-status-select option {
+            background-color: #fff;
+            color: #000;
+        }
+        
+        /* 确保输入框和下拉菜单在触摸设备上更易于交互 */
+        @media (max-width: 1024px) {
+            .cat-number-input {
+                min-width: 65%;
+            }
+            
+            .cat-status-select {
+                width: 35%;
+            }
+        }
 
     </style>
     <!-- 测试数据脚本，生产环境可移除 -->

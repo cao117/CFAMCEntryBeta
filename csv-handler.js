@@ -27,9 +27,9 @@ function saveToTempCSV() {
     const judgeRows = document.getElementById('judgeInfoTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
     let judgeData = 'Judge Name,Judge Acronym,Ring Type\n'; // 添加裁判数据的标题行
     for (let row of judgeRows) {
-        const judgeName = row.getElementsByTagName('td')[1].querySelector('input').value || ''; // 如果为空则使用空字符串
-        const judgeAcronym = row.getElementsByTagName('td')[2].querySelector('input').value || ''; // 如果为空则使用空字符串
-        const ringType = row.getElementsByTagName('td')[3].querySelector('select').value || ''; // 如果为空则使用空字符串
+        const judgeName = row.getElementsByTagName('td')[1].querySelector('input').value;
+        const judgeAcronym = row.getElementsByTagName('td')[2].querySelector('input').value;
+        const ringType = row.getElementsByTagName('td')[3].querySelector('select').value;
         judgeData += `${judgeName},${judgeAcronym},${ringType}\n`;  // 添加每个裁判的数据
     }
     csvContent += judgeData;
@@ -37,7 +37,7 @@ function saveToTempCSV() {
 
     // 各个表格的ID列表
     let tableIds = ["championshipTable", "kittenTable", "premiershipTable"];
-    let allRowData = []; // 存储所有行数据的数组
+    let allRowData = [];
 
     tableIds.forEach((tableId) => {
         console.log(`开始处理表格: ${tableId}`);
@@ -52,11 +52,46 @@ function saveToTempCSV() {
 
                 // 遍历每一列
                 cols.forEach((col, colIndex) => {
-                    let input = col.querySelector('input');
-                    if (input) {
-                        rowData.push(input.value);
+                    // 检查是否是Championship表格中的1-15名行
+                    const isChampionshipTable = tableId === 'championshipTable';
+                    const isPremiershipTable = tableId === 'premiershipTable';
+                    const isTop15Row = (isChampionshipTable && rowIndex >= 3 && rowIndex <= 17) || 
+                                      (isPremiershipTable && rowIndex >= 3 && rowIndex <= 17);
+                    
+                    if (isTop15Row) {
+                        // 处理复合控件：猫编号和状态
+                        const container = col.querySelector('.input-select-container');
+                        if (container) {
+                            const catNumberInput = container.querySelector('.cat-number-input');
+                            const statusSelect = container.querySelector('.cat-status-select');
+                            
+                            // 如果猫编号存在，则格式为: 编号[状态] 如: 123[GC] 或 123[GP]
+                            if (catNumberInput && catNumberInput.value) {
+                                const catNumber = catNumberInput.value.trim();
+                                const status = statusSelect ? statusSelect.value : (isChampionshipTable ? 'GC' : 'GP');
+                                rowData.push(`${catNumber}[${status}]`);
+                            } else {
+                                // 如果没有输入猫编号，则只保存状态，用于CSV恢复时判断
+                                const status = statusSelect ? statusSelect.value : (isChampionshipTable ? 'GC' : 'GP');
+                                rowData.push(`[${status}]`);
+                            }
+                        } else {
+                            // 如果未找到复合控件，则尝试读取普通输入框
+                            let input = col.querySelector('input');
+                            if (input) {
+                                rowData.push(input.value);
+                            } else {
+                                rowData.push(col.innerText);
+                            }
+                        }
                     } else {
-                        rowData.push(col.innerText);
+                        // 处理普通单元格
+                        let input = col.querySelector('input');
+                        if (input) {
+                            rowData.push(input.value);
+                        } else {
+                            rowData.push(col.innerText);
+                        }
                     }
                 });
 
@@ -131,7 +166,7 @@ function generateFinalCSV() {
 
     // 各个表格的ID列表
     let tableIds = ["championshipTable", "kittenTable", "premiershipTable"];
-    let allRowData = []; // 存储所有行数据的数组
+    let allRowData = [];
 
     tableIds.forEach((tableId) => {
         console.log(`开始处理表格: ${tableId}`);
@@ -146,11 +181,46 @@ function generateFinalCSV() {
 
                 // 遍历每一列
                 cols.forEach((col, colIndex) => {
-                    let input = col.querySelector('input');
-                    if (input) {
-                        rowData.push(input.value);
+                    // 检查是否是Championship表格中的1-15名行
+                    const isChampionshipTable = tableId === 'championshipTable';
+                    const isPremiershipTable = tableId === 'premiershipTable';
+                    const isTop15Row = (isChampionshipTable && rowIndex >= 3 && rowIndex <= 17) || 
+                                      (isPremiershipTable && rowIndex >= 3 && rowIndex <= 17);
+                    
+                    if (isTop15Row) {
+                        // 处理复合控件：猫编号和状态
+                        const container = col.querySelector('.input-select-container');
+                        if (container) {
+                            const catNumberInput = container.querySelector('.cat-number-input');
+                            const statusSelect = container.querySelector('.cat-status-select');
+                            
+                            // 如果猫编号存在，则格式为: 编号[状态] 如: 123[GC] 或 123[GP]
+                            if (catNumberInput && catNumberInput.value) {
+                                const catNumber = catNumberInput.value.trim();
+                                const status = statusSelect ? statusSelect.value : (isChampionshipTable ? 'GC' : 'GP');
+                                rowData.push(`${catNumber}[${status}]`);
+                            } else {
+                                // 如果没有输入猫编号，则只保存状态，用于CSV恢复时判断
+                                const status = statusSelect ? statusSelect.value : (isChampionshipTable ? 'GC' : 'GP');
+                                rowData.push(`[${status}]`);
+                            }
+                        } else {
+                            // 如果未找到复合控件，则尝试读取普通输入框
+                            let input = col.querySelector('input');
+                            if (input) {
+                                rowData.push(input.value);
+                            } else {
+                                rowData.push(col.innerText);
+                            }
+                        }
                     } else {
-                        rowData.push(col.innerText);
+                        // 处理普通单元格
+                        let input = col.querySelector('input');
+                        if (input) {
+                            rowData.push(input.value);
+                        } else {
+                            rowData.push(col.innerText);
+                        }
                     }
                 });
 
@@ -296,57 +366,73 @@ function validateAndNavigate() {
 }
 
 /**
- * 验证特定表格的数据
+ * 验证表格数据
  * @param {HTMLElement} tableBody - 表格体元素
- * @param {string} tabId - 表格所在的标签页ID
+ * @param {string} tabId - 表格ID
  * @returns {boolean} 验证通过返回true，否则返回false
  */
 function validateTableData(tableBody, tabId) {
     const rows = tableBody.getElementsByTagName('tr');
     
-    // 对每列(每个组别)进行验证
-    // 首先确定列数
-    if (rows.length < 3) return true; // 表格还没有生成，跳过验证
+    // 获取judgeColumns，判断有多少列数据(不包括第一列标题列)
+    const firstRow = rows[0];
+    const judgeColumns = firstRow ? firstRow.getElementsByTagName('td').length - 1 : 0;
     
-    const judgeColumns = rows[0].querySelectorAll('input').length;
-    console.log(`验证${tabId}表格，共有${judgeColumns}列数据`);
+    console.log(`验证表格 ${tabId}，列数: ${judgeColumns}`);
     
-    // 对每一列进行验证
+    // 验证每一列
     for (let col = 0; col < judgeColumns; col++) {
         // 获取该列所有值
-        const colValues = [];
-        const ringNumber = rows[0].querySelectorAll('input')[col].value;
-        const judgeName = rows[1].querySelectorAll('input')[col].value;
-        const ringType = rows[2].querySelectorAll('input')[col].value;
-        
-        // 只验证有环号和裁判的列
-        if (!ringNumber || !judgeName) continue;
-        
-        console.log(`验证第${col+1}列 (环号:${ringNumber}, 裁判:${judgeName}, 类型:${ringType})`);
-        
-        // 获取1-15名的输入值
-        for (let i = 3; i <= 17; i++) {
-            if (i < rows.length) {
-                const inputs = rows[i].querySelectorAll('input');
+        const columnValues = [];
+        // 从第4行开始(索引3)，获取1-15名的猫的数据
+        for (let row = 3; row <= 17 && row < rows.length; row++) {
+            let input;
+            let value = '';
+            
+            // 检查是否是复合控件
+            const isChampionshipTable = tabId === 'championship';
+            const isPremiershipTable = tabId === 'premiership';
+            const isTop15Row = (isChampionshipTable || isPremiershipTable) && row >= 3 && row <= 17;
+            
+            if (isTop15Row) {
+                // 获取单元格
+                const cell = rows[row].getElementsByTagName('td')[col + 1]; // +1 因为第一列是标题列
+                if (!cell) continue;
+                
+                // 检查是否是复合控件
+                const container = cell.querySelector('.input-select-container');
+                if (container) {
+                    input = container.querySelector('.cat-number-input');
+                    value = input ? input.value.trim() : '';
+                } else {
+                    input = cell.querySelector('input');
+                    value = input ? input.value.trim() : '';
+                }
+            } else {
+                const inputs = rows[row].querySelectorAll('input');
                 if (inputs.length > col) {
-                    const input = inputs[col];
-                    const value = input.value.trim();
-                    
-                    colValues.push({
-                        row: i,
-                        element: input,
-                        value: value,
-                        position: i - 2 // 对应的排名(1-15)
-                    });
+                    input = inputs[col];
+                    value = input.value.trim();
                 }
             }
+            
+            columnValues.push({
+                row: row,
+                element: input,
+                value: value,
+                position: row - 2 // 对应的排名(1-15)
+            });
         }
         
-        // 验证该列的输入值
-        if (!validateColumn(colValues, tabId, col, ringNumber, judgeName)) {
+        // 获取环号和裁判名称
+        const ringNumber = rows[0].querySelectorAll('input')[col]?.value || col + 1;
+        const judgeName = rows[1].querySelectorAll('input')[col]?.value || '';
+        
+        // 验证该列的所有1-15名值
+        if (!validateColumn(columnValues, tabId, col, ringNumber, judgeName)) {
             return false;
         }
-        
+
         // 验证决赛猫的数据
         if (tabId === 'championship') {
             // 验证Best CH系列 (行18-22)
@@ -365,6 +451,34 @@ function validateTableData(tableBody, tabId) {
             const bestSHValues = collectFinalsValues(rows, col, 28, 32);
             if (!validateFinalsGroup(bestSHValues, tabId, col, ringNumber, judgeName, 'Best SH CH')) {
                 return false;
+            }
+            
+            // 获取第3行的Ring Type
+            const ringTypeCell = rows[2].getElementsByTagName('td')[col + 1]; // +1 因为第一列是标题列
+            
+            // 从输入框而不是从单元格文本中获取Ring Type
+            if (ringTypeCell) {
+                const ringTypeInput = ringTypeCell.querySelector('input');
+                if (ringTypeInput) {
+                    ringType = ringTypeInput.value.trim();
+                }
+            }
+            
+            // 只有在Ring Type为Allbreed时进行CH猫的关系验证
+            if (ringType === 'Allbreed') {
+
+                // 获取Top 15中的CH猫和Best CH/LH CH/SH CH系列的猫
+                const top15CHCats = collectTop15CHCats(rows, col);
+                
+                // 验证Best CH系列与Top 15中CH猫的关系
+                if (!validateBestCHWithTop15(top15CHCats, bestCHValues, ringNumber, judgeName)) {
+                    return false;
+                }
+                
+                // 验证Best LH CH和Best SH CH与Best CH的关系
+                if (!validateLHSHWithBestCH(bestCHValues, bestLHValues, bestSHValues, ringNumber, judgeName)) {
+                    return false;
+                }
             }
         }
         
@@ -405,18 +519,29 @@ function collectFinalsValues(rows, col, startRow, endRow) {
     
     for (let i = startRow; i <= endRow; i++) {
         if (i < rows.length) {
-            const inputs = rows[i].querySelectorAll('input');
-            if (inputs.length > col) {
-                const input = inputs[col];
-                const value = input.value.trim();
-                
-                values.push({
-                    row: i,
-                    element: input,
-                    value: value,
-                    position: i - startRow + 1 // 在此组中的位置
-                });
+            // 获取单元格
+            const cell = rows[i].getElementsByTagName('td')[col + 1]; // +1 因为第一列是标题
+            if (!cell) continue;
+            
+            let input, value;
+            
+            // 检查是否是复合控件
+            const container = cell.querySelector('.input-select-container');
+            if (container) {
+                input = container.querySelector('.cat-number-input');
+                value = input ? input.value.trim() : '';
+            } else {
+                // 传统的单一输入框
+                input = cell.querySelector('input');
+                value = input ? input.value.trim() : '';
             }
+            
+            values.push({
+                row: i,
+                element: input,
+                value: value,
+                position: i - startRow + 1 // 在此组中的位置
+            });
         }
     }
     
@@ -489,32 +614,28 @@ function validateFinalsGroup(values, tabId, colIndex, ringNumber, judgeName, gro
 }
 
 /**
- * 验证一列数据
- * @param {Array} values - 列中的值及其元素信息
- * @param {string} tabId - 表格所在的标签页ID
+ * 验证所有表格中的列
+ * @param {Array} values - 单元格值集合
+ * @param {string} tabId - 表格ID
  * @param {number} colIndex - 列索引
- * @param {string} ringNumber - 该列的环号
- * @param {string} judgeName - 该列的裁判名
+ * @param {string} ringNumber - 环号
+ * @param {string} judgeName - 裁判名称
  * @returns {boolean} 验证通过返回true，否则返回false
  */
 function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
-    const usedNumbers = new Set(); // 记录已使用的数字
+    // 跳过所有空值或值为void的行
+    const nonEmptyValues = values.filter(valueObj => valueObj.value && valueObj.value.toLowerCase() !== 'void');
+    if (nonEmptyValues.length === 0) {
+        return true; // 全部为空或void，验证通过
+    }
     
-    // 检查输入顺序和值
-    for (let i = 0; i < values.length; i++) {
-        const valueObj = values[i];
-        const value = valueObj.value.toLowerCase();
-        
-        // 跳过空值
-        if (!value) continue;
-        
-        // 允许输入"void"(不区分大小写)
-        if (value === 'void') continue;
-        
-        // 验证是否是1-450之间的整数
+    // 验证数值（必须是1-450之间的整数）
+    const usedNumbers = new Set();
+    for (const valueObj of nonEmptyValues) {
+        const value = valueObj.value.trim().toLowerCase();
         if (!/^\d+$/.test(value)) {
             switchTab(tabId);
-            alert(`Cat # entered for Ring #${ringNumber} Under Judge (${judgeName})  Position #${valueObj.position} was "${value}", but it must be a number between 1-450 or void`);
+            alert(`Invalid Number "${value}" for Ring #${ringNumber} Under Judge (${judgeName}) Position #${valueObj.position}`);
             highlightElement(valueObj.element);
             return false;
         }
@@ -522,19 +643,9 @@ function validateColumn(values, tabId, colIndex, ringNumber, judgeName) {
         const numValue = parseInt(value, 10);
         if (numValue < 1 || numValue > 450) {
             switchTab(tabId);
-            alert(`Cat # entered for Ring #${ringNumber} Under Judge (${judgeName})  Position #${valueObj.position} was "${value}", but it must be a number between 1-450`);
+            alert(`Cat # ${numValue} is Out of Range (1-450) for Ring #${ringNumber} Under Judge (${judgeName}) Position #${valueObj.position}`);
             highlightElement(valueObj.element);
             return false;
-        }
-        
-        // 检查前面的排名是否有值
-        for (let j = 0; j < i; j++) {
-            if (!values[j].value) {
-                switchTab(tabId);
-                alert(`Cat # Entered for Ring #${ringNumber} Under Judge(${judgeName}) Position ${valueObj.position}，but Previous Row #${values[j].position} Was Not Filled, Please Complete`);
-                highlightElement(values[j].element);
-                return false;
-            }
         }
         
         // 检查重复数字
@@ -757,15 +868,79 @@ function restoreFromCSV() {
                             while (currentRow < rows.length && rows[currentRow].trim() !== '' && tableIndex < tableRows.length) {
                                 const rowData = rows[currentRow].split(',');
                                 const tableRow = tableRows[tableIndex];
-                                const inputs = tableRow.querySelectorAll('input');
                                 
-                                console.log(`处理表格行 ${tableIndex}(${tableRow ? tableRow.innerText.substring(0, 10) : 'undefined'}), CSV行 ${currentRow}, 数据长度: ${rowData.length}, 输入框数量: ${inputs.length}`);
+                                console.log(`处理表格行 ${tableIndex}(${tableRow ? tableRow.innerText.substring(0, 10) : 'undefined'}), CSV行 ${currentRow}, 数据长度: ${rowData.length}`);
                                 
-                                // 处理每一行数据
-                                if (inputs.length > 0 && rowData.length > 1) {
-                                    for (let i = 0; i < inputs.length && i + 1 < rowData.length; i++) {
+                                // 检查是否是Championship表格的1-15名行(索引3-17)
+                                const isChampionshipTable = tableInfo.id === 'championshipTableBody';
+                                const isPremiershipTable = tableInfo.id === 'premiershipTableBody';
+                                const isTop15Row = (isChampionshipTable && tableIndex >= 3 && tableIndex <= 17) ||
+                                                 (isPremiershipTable && tableIndex >= 3 && tableIndex <= 17);
+                                
+                                if (isTop15Row) {
+                                    // 处理带状态的复合控件
+                                    for (let i = 0; i < rowData.length - 1; i++) {
                                         const csvValue = rowData[i + 1] ? rowData[i + 1].trim() : '';
-                                        inputs[i].value = csvValue;
+                                        
+                                        // 查找对应单元格中的复合控件
+                                        const td = tableRow.getElementsByTagName('td')[i + 1];
+                                        if (!td) continue;
+                                        
+                                        const container = td.querySelector('.input-select-container');
+                                        if (container) {
+                                            const catNumberInput = container.querySelector('.cat-number-input');
+                                            const statusSelect = container.querySelector('.cat-status-select');
+                                            
+                                            if (catNumberInput && statusSelect) {
+                                                // 尝试解析格式为 "123[GC]" 或 "[GC]" 或 "123[GP]" 或 "[GP]" 的数据
+                                                const matchResult = csvValue.match(/^(\d+)?\[([A-Z]+)\]$/);
+                                                if (matchResult) {
+                                                    // 有匹配结果
+                                                    const catNumber = matchResult[1] || ''; // 可能为undefined
+                                                    const status = matchResult[2] || '';  // 状态值
+                                                    
+                                                    catNumberInput.value = catNumber;
+                                                    
+                                                    // 确保状态是有效值，根据表格类型选择默认值
+                                                    if (isChampionshipTable) {
+                                                        // Championship表格检查GC、CH、NOV
+                                                        if (status === 'GC' || status === 'CH' || status === 'NOV') {
+                                                            statusSelect.value = status;
+                                                        } else {
+                                                            statusSelect.value = 'GC'; // 默认值
+                                                        }
+                                                    } else if (isPremiershipTable) {
+                                                        // Premiership表格检查GP、PR、NOV
+                                                        if (status === 'GP' || status === 'PR' || status === 'NOV') {
+                                                            statusSelect.value = status;
+                                                        } else {
+                                                            statusSelect.value = 'GP'; // 默认值
+                                                        }
+                                                    }
+                                                } else {
+                                                    // 旧CSV格式或无格式，只填充猫编号，状态使用默认值
+                                                    catNumberInput.value = csvValue;
+                                                    statusSelect.value = isChampionshipTable ? 'GC' : 'GP'; // 根据表格类型选择默认值
+                                                }
+                                            }
+                                        } else {
+                                            // 找不到复合控件，但有可能是旧版本生成的表格，尝试找普通输入框
+                                            const input = td.querySelector('input');
+                                            if (input) {
+                                                input.value = csvValue;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // 普通行处理
+                                    const inputs = tableRow.querySelectorAll('input');
+                                    
+                                    // 处理每一行数据
+                                    if (inputs.length > 0 && rowData.length > 1) {
+                                        for (let i = 0; i < inputs.length && i + 1 < rowData.length; i++) {
+                                            const csvValue = rowData[i + 1] ? rowData[i + 1].trim() : '';
+                                            inputs[i].value = csvValue;
+                                        }
                                     }
                                 }
                                 
@@ -832,6 +1007,10 @@ function clearAllContent() {
  */
 function validateInputOnBlur(event) {
     const input = event.target;
+    
+    // 检查是否是cat-number-input类的输入框(只验证猫编号，不验证状态下拉选择)
+    const isCatNumberInput = input.classList.contains('cat-number-input');
+    
     const value = input.value.trim().toLowerCase();
     
     // 重置样式
@@ -859,7 +1038,18 @@ function validateInputOnBlur(event) {
     }
     
     // 找到当前单元格所在的表格、行和列
-    const cell = input.closest('td');
+    let cell;
+    
+    if (isCatNumberInput) {
+        // 如果是猫编号输入框，需要往上找到容器的父元素td
+        const container = input.closest('.input-select-container');
+        cell = container ? container.closest('td') : input.closest('td');
+    } else {
+        cell = input.closest('td');
+    }
+    
+    if (!cell) return;
+    
     const row = cell.parentElement;
     const table = row.closest('table');
     const tbody = table.querySelector('tbody');
@@ -899,8 +1089,24 @@ function validateInputOnBlur(event) {
         
         // 检查前面的排名是否有值
         for (let i = 3; i < rowIndex; i++) {
-            const prevInput = rows[i].querySelectorAll('input')[colIndex];
-            if (!prevInput || !prevInput.value.trim()) {
+            // 针对不同类型的输入框检查值
+            let prevValue = '';
+            const prevCell = rows[i].getElementsByTagName('td')[colIndex + 1]; // +1是因为第一列是标题列
+            
+            if (prevCell) {
+                // 检查是否是复合控件
+                const prevContainer = prevCell.querySelector('.input-select-container');
+                if (prevContainer) {
+                    const prevInput = prevContainer.querySelector('.cat-number-input');
+                    prevValue = prevInput ? prevInput.value.trim() : '';
+                } else {
+                    // 传统的单一输入框
+                    const prevInput = prevCell.querySelector('input');
+                    prevValue = prevInput ? prevInput.value.trim() : '';
+                }
+            }
+            
+            if (!prevValue) {
                 input.style.backgroundColor = '#ffcccc';
                 input.title = `Row #${rowIndex-2} was Filled, but Previous Row #${i-2} was not Filled, Please Complete`;
                 return;
@@ -912,9 +1118,21 @@ function validateInputOnBlur(event) {
         for (let i = 3; i <= 17 && i < rows.length; i++) {
             if (i === rowIndex) continue; // 跳过当前行
             
-            const otherInput = rows[i].querySelectorAll('input')[colIndex];
-            if (otherInput) {
-                const otherValue = otherInput.value.trim().toLowerCase();
+            const otherCell = rows[i].getElementsByTagName('td')[colIndex + 1]; // +1是因为第一列是标题列
+            if (otherCell) {
+                let otherValue = '';
+                
+                // 检查是否是复合控件
+                const otherContainer = otherCell.querySelector('.input-select-container');
+                if (otherContainer) {
+                    const otherInput = otherContainer.querySelector('.cat-number-input');
+                    otherValue = otherInput ? otherInput.value.trim().toLowerCase() : '';
+                } else {
+                    // 传统的单一输入框
+                    const otherInput = otherCell.querySelector('input');
+                    otherValue = otherInput ? otherInput.value.trim().toLowerCase() : '';
+                }
+                
                 if (otherValue && otherValue !== 'void' && /^\d+$/.test(otherValue)) {
                     const otherNumValue = parseInt(otherValue, 10);
                     usedNumbers.add(otherNumValue);
@@ -1024,59 +1242,197 @@ function validateInputOnBlur(event) {
                 input.title = `输入值${numValue}在${groupName}组中已使用过，不能重复`;
                 return;
             }
+            
+            // 只有在Championship表格中才进行CH关系验证
+            if (realTableId.includes('championship')) {
+                // 获取第3行的Ring Type
+                const ringTypeCell = rows[2].getElementsByTagName('td')[colIndex + 1]; // +1 因为第一列是标题列
+                let ringType = 'Allbreed'; // 默认值
+                
+                // 从输入框而不是从单元格文本中获取Ring Type
+                if (ringTypeCell) {
+                    const ringTypeInput = ringTypeCell.querySelector('input');
+                    if (ringTypeInput) {
+                        ringType = ringTypeInput.value.trim();
+                    }
+                }
+                
+                // 只有在Ring Type为Allbreed时进行CH猫的关系验证
+                if (ringType === 'Allbreed') {
+                    // 1. 如果是Best CH系列中的输入，则验证与Top 15中CH猫的关系
+                    if (groupName === 'Best CH') {
+                        const top15CHCats = collectTop15CHCats(rows, colIndex);
+                        // 如果Top 15中有CH猫，则验证Best CH系列与Top 15中CH猫的顺序一致性
+                        if (top15CHCats.length > 0) {
+                            const bestCHValues = collectFinalsValues(rows, colIndex, 18, 22);
+                            const nonEmptyBestCH = bestCHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+                            
+                            // 找到当前输入在Best CH系列中的位置
+                            const currentPosition = rowIndex - 18;
+                            
+                            // 如果当前输入的位置超过了Top 15中CH猫的数量
+                            if (currentPosition >= top15CHCats.length) {
+                                input.style.backgroundColor = '#ffcccc';
+                                input.title = `Top 15中只有${top15CHCats.length}个CH猫，但您正在填写第${currentPosition + 1}个Best CH猫`;
+                                return;
+                            }
+                            
+                            // 验证当前输入的值是否与对应位置的Top 15中CH猫一致
+                            if (top15CHCats[currentPosition] && numValue !== parseInt(top15CHCats[currentPosition].value)) {
+                                input.style.backgroundColor = '#ffcccc';
+                                input.title = `此位置应填写猫编号${top15CHCats[currentPosition].value}，与Top 15中CH猫的顺序保持一致`;
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // 2. 如果是Best LH CH或Best SH CH系列中的输入，则验证与Best CH系列的关系
+                    if (groupName === 'Best LH CH' || groupName === 'Best SH CH') {
+                        const bestCHValues = collectFinalsValues(rows, colIndex, 18, 22);
+                        const nonEmptyBestCH = bestCHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+                        
+                        // 如果Best CH系列为空，则不允许填写Best LH CH或Best SH CH
+                        if (nonEmptyBestCH.length === 0) {
+                            input.style.backgroundColor = '#ffcccc';
+                            input.title = `Best CH系列为空，不能填写${groupName}`;
+                            return;
+                        }
+                        
+                        // 获取所有Best CH编号
+                        const bestCHNumbers = nonEmptyBestCH.map(v => v.value);
+                        
+                        // 检查当前输入的编号是否在Best CH系列中
+                        if (!bestCHNumbers.includes(value)) {
+                            input.style.backgroundColor = '#ffcccc';
+                            input.title = `猫编号${value}不在Best CH系列中，${groupName}中的猫必须来自Best CH系列`;
+                            return;
+                        }
+                        
+                        // 获取Best LH CH和Best SH CH系列中的所有编号
+                        const bestLHValues = collectFinalsValues(rows, colIndex, 23, 27);
+                        const bestSHValues = collectFinalsValues(rows, colIndex, 28, 32);
+                        const nonEmptyBestLH = bestLHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+                        const nonEmptyBestSH = bestSHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+                        const bestLHNumbers = nonEmptyBestLH.map(v => v.value);
+                        const bestSHNumbers = nonEmptyBestSH.map(v => v.value);
+                        
+                        // 检查是否有编号同时出现在Best LH CH和Best SH CH中
+                        if (groupName === 'Best LH CH' && bestSHNumbers.includes(value)) {
+                            input.style.backgroundColor = '#ffcccc';
+                            input.title = `猫编号${value}已经在Best SH CH系列中使用，每个猫只能出现在一个系列中`;
+                            return;
+                        } else if (groupName === 'Best SH CH' && bestLHNumbers.includes(value)) {
+                            input.style.backgroundColor = '#ffcccc';
+                            input.title = `猫编号${value}已经在Best LH CH系列中使用，每个猫只能出现在一个系列中`;
+                            return;
+                        }
+                        
+                        // 验证顺序一致性
+                        // 创建Best CH位置映射表
+                        const bestCHPositions = {};
+                        bestCHNumbers.forEach((num, index) => {
+                            bestCHPositions[num] = index;
+                        });
+                        
+                        if (groupName === 'Best LH CH') {
+                            // 提取当前编号之前的所有Best LH CH编号
+                            const prevBestLH = [];
+                            for (let i = 23; i < rowIndex; i++) {
+                                const prevInput = rows[i].querySelectorAll('input')[colIndex];
+                                const prevValue = prevInput ? prevInput.value.trim() : '';
+                                if (prevValue && prevValue !== 'void' && bestCHNumbers.includes(prevValue)) {
+                                    prevBestLH.push(prevValue);
+                                }
+                            }
+                            
+                            // 检查顺序是否一致
+                            for (const prevNum of prevBestLH) {
+                                if (bestCHPositions[prevNum] > bestCHPositions[value]) {
+                                    input.style.backgroundColor = '#ffcccc';
+                                    input.title = `猫编号${value}在Best CH系列中的位置早于${prevNum}，但在Best LH CH系列中的顺序相反`;
+                                    return;
+                                }
+                            }
+                        } else if (groupName === 'Best SH CH') {
+                            // 提取当前编号之前的所有Best SH CH编号
+                            const prevBestSH = [];
+                            for (let i = 28; i < rowIndex; i++) {
+                                const prevInput = rows[i].querySelectorAll('input')[colIndex];
+                                const prevValue = prevInput ? prevInput.value.trim() : '';
+                                if (prevValue && prevValue !== 'void' && bestCHNumbers.includes(prevValue)) {
+                                    prevBestSH.push(prevValue);
+                                }
+                            }
+                            
+                            // 检查顺序是否一致
+                            for (const prevNum of prevBestSH) {
+                                if (bestCHPositions[prevNum] > bestCHPositions[value]) {
+                                    input.style.backgroundColor = '#ffcccc';
+                                    input.title = `猫编号${value}在Best CH系列中的位置早于${prevNum}，但在Best SH CH系列中的顺序相反`;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 3. 验证是否所有Best CH编号都被分配到了Best LH CH或Best SH CH中
+                    // 这个检查只在用户完成输入后执行，不在每次blur事件中检查
+                }
+            }
         }
     }
 }
 
 /**
- * 为所有表格的输入框添加blur事件监听器
+ * 设置表格输入框的验证
  */
 function setupInputValidation() {
-    const tables = ["championshipTableBody", "kittenTableBody", "premiershipTableBody"];
-    let totalInputs = 0;
-    
-    console.log("设置输入验证监听器...");
-    
-    tables.forEach(tableId => {
-        const tableBody = document.getElementById(tableId);
-        if (tableBody) {
-            const rows = tableBody.getElementsByTagName('tr');
-            console.log(`表格 ${tableId} 有 ${rows.length} 行`);
-            
-            let tableInputs = 0;
-            
-            // 从第4行开始(索引3)到第18行(索引17)，这些是猫ID的输入行
-            for (let i = 3; i < rows.length; i++) {
-                // 为所有输入框添加验证，包括1-15名和决赛行
-                const inputs = rows[i].querySelectorAll('input');
-                for (let j = 0; j < inputs.length; j++) {
-                    // 移除旧的事件监听器（避免重复）
-                    inputs[j].removeEventListener('blur', validateInputOnBlur);
-                    // 添加新的事件监听器
-                    inputs[j].addEventListener('blur', validateInputOnBlur);
-                    tableInputs++;
-                    
-                    // 添加一个自定义属性，用于标记已添加事件监听器
-                    inputs[j].setAttribute('data-has-validator', 'true');
-                    
-                    // 添加调试事件输出
-                    inputs[j].addEventListener('focus', function() {
-                        console.log(`输入框获得焦点: 行=${i}, 列=${j}`);
-                    });
-                }
-            }
-            
-            console.log(`已为表格 ${tableId} 的 ${tableInputs} 个输入框添加验证`);
-            totalInputs += tableInputs;
-        } else {
-            console.log(`找不到表格 ${tableId}`);
-        }
+    // 移除所有现有的验证监听器
+    const inputs = document.querySelectorAll('input[data-has-validator="true"]');
+    inputs.forEach(input => {
+        input.removeEventListener('blur', validateInputOnBlur);
+        input.removeAttribute('data-has-validator');
     });
     
-    console.log(`总共为 ${totalInputs} 个输入框添加了验证监听器`);
+    // 添加验证到冠军组表格
+    const championshipTable = document.getElementById('championshipTable');
+    if (championshipTable) {
+        // 为普通输入框添加验证
+        const regularInputs = championshipTable.querySelectorAll('input:not(.cat-number-input)');
+        regularInputs.forEach(input => {
+            input.addEventListener('blur', validateInputOnBlur);
+            input.setAttribute('data-has-validator', 'true');
+        });
+        
+        // 为猫编号输入框添加验证
+        const catNumberInputs = championshipTable.querySelectorAll('.cat-number-input');
+        catNumberInputs.forEach(input => {
+            input.addEventListener('blur', validateInputOnBlur);
+            input.setAttribute('data-has-validator', 'true');
+        });
+    }
     
-    // 手动触发一次表单验证检查
-    checkAllValidations();
+    // 添加验证到幼猫组表格
+    const kittenTable = document.getElementById('kittenTable');
+    if (kittenTable) {
+        const inputs = kittenTable.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', validateInputOnBlur);
+            input.setAttribute('data-has-validator', 'true');
+        });
+    }
+    
+    // 添加验证到绝育组表格
+    const premiershipTable = document.getElementById('premiershipTable');
+    if (premiershipTable) {
+        const inputs = premiershipTable.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', validateInputOnBlur);
+            input.setAttribute('data-has-validator', 'true');
+        });
+    }
+    
+    console.log("输入框验证设置完成");
 }
 
 /**
@@ -1131,61 +1487,175 @@ function updateJudgeInformation() {
 }
 
 /**
- * 生成冠军组、幼猫组和绝育组表格的行
- * @param {HTMLElement} tableBody - 表格体元素
- * @param {number} rows - 行数
- * @param {Array} rowHeaders - 行标题数组
- * @param {number} totalColumns - 总列数
+ * 收集Top 15中的CH状态猫
+ * @param {HTMLCollection} rows - 表格行集合
+ * @param {number} col - 列索引
+ * @returns {Array} 包含CH状态猫的编号和行索引的数组
  */
-function generateTableRows(tableBody, rows, rowHeaders, totalColumns) {
-    // 清空表格内容
-    tableBody.innerHTML = '';
-    console.log(`为 ${tableBody.id} 生成 ${rows} 行，${totalColumns} 列`);
+function collectTop15CHCats(rows, col) {
+    const chCats = [];
     
-    for (let i = 0; i < rows; i++) {
-        const row = document.createElement('tr');
+    // 遍历Top 15行 (行索引3-17)
+    for (let row = 3; row <= 17 && row < rows.length; row++) {
+        const cell = rows[row].getElementsByTagName('td')[col + 1]; // +1 因为第一列是标题
+        if (!cell) continue;
         
-        // Row header in the first column
-        const headerCell = document.createElement('td');
-        headerCell.textContent = rowHeaders[i];
-        row.appendChild(headerCell);
-
-        // Add dynamic columns for the judges and type
-        for (let j = 0; j < totalColumns; j++) {
-            const judgeCell = document.createElement('td');
-            const judgeInput = document.createElement('input');
-            judgeInput.type = 'text';
-            judgeInput.setAttribute('data-col', j);
-            judgeInput.setAttribute('data-row', i);
+        // 检查是否是复合控件
+        const container = cell.querySelector('.input-select-container');
+        if (container) {
+            const catNumberInput = container.querySelector('.cat-number-input');
+            const statusSelect = container.querySelector('.cat-status-select');
             
-            switch (headerCell.textContent) {
-                case 'Ring #':
-                    judgeInput.classList.add('ring' + j);
-                    break;
-                case 'Judge':
-                    judgeInput.classList.add('judge' + j);
-                    break;
-                case 'Type':
-                    judgeInput.classList.add('type' + j);
-                    break;
+            const catNumber = catNumberInput ? catNumberInput.value.trim() : '';
+            const status = statusSelect ? statusSelect.value : 'GC';
+            
+            // 如果猫的状态是CH且有编号，则添加到列表中
+            if (catNumber && status === 'CH') {
+                chCats.push({
+                    row: row,
+                    value: catNumber,
+                    position: row - 2 // 对应的排名(1-15)
+                });
             }
-            
-            // 为所有输入框添加blur事件监听器，包括1-15名和决赛行
-            judgeInput.addEventListener('blur', function(e) {
-                console.log(`输入框失去焦点: 表格=${tableBody.id}, 行=${i}, 列=${j}, 值=${this.value}`);
-                validateInputOnBlur(e);
-            });
-            judgeInput.setAttribute('data-has-validator', 'true');
-            
-            judgeCell.appendChild(judgeInput);
-            row.appendChild(judgeCell);
         }
-
-        tableBody.appendChild(row);
     }
     
-    console.log(`${tableBody.id} 表格生成完成`);
+    // 按照位置排序（从小到大）
+    chCats.sort((a, b) => a.position - b.position);
     
-    // 触发自定义事件，通知表格已更新
-    document.dispatchEvent(tableUpdatedEvent);
+    return chCats;
+}
+
+/**
+ * 验证Best CH系列与Top 15中CH猫的关系
+ * @param {Array} top15CHCats - Top 15中CH状态的猫的列表
+ * @param {Array} bestCHValues - Best CH系列的猫的列表
+ * @param {string} ringNumber - 环号
+ * @param {string} judgeName - 裁判名称
+ * @returns {boolean} 验证通过返回true，否则返回false
+ */
+function validateBestCHWithTop15(top15CHCats, bestCHValues, ringNumber, judgeName) {
+    // 如果Top 15中没有CH猫，则不验证Best CH系列
+    if (top15CHCats.length === 0) {
+        return true;
+    }
+    
+    // 过滤掉Best CH系列中的空值
+    const nonEmptyBestCH = bestCHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+    
+    // 获取Top 15中CH状态猫的编号列表
+    const chCatNumbers = top15CHCats.map(cat => cat.value);
+    console.log(chCatNumbers);
+
+    // 验证Best CH系列中的猫编号必须按顺序与Top 15中的CH猫一致
+    for (let i = 0; i < Math.min(nonEmptyBestCH.length, top15CHCats.length); i++) {
+        const bestCHNumber = nonEmptyBestCH[i].value;
+        const expectedCHNumber = chCatNumbers[i];
+        
+        if (bestCHNumber !== expectedCHNumber) {
+            switchTab('championship');
+            alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，Best CH系列中第${i+1}个应该是猫编号${expectedCHNumber}，而不是${bestCHNumber}。Best CH系列必须与Top 15中的CH猫按顺序一致。`);
+            highlightElement(nonEmptyBestCH[i].element);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+/**
+ * 验证Best LH CH和Best SH CH与Best CH的关系
+ * @param {Array} bestCHValues - Best CH系列的猫的列表
+ * @param {Array} bestLHValues - Best LH CH系列的猫的列表
+ * @param {Array} bestSHValues - Best SH CH系列的猫的列表
+ * @param {string} ringNumber - 环号
+ * @param {string} judgeName - 裁判名称
+ * @returns {boolean} 验证通过返回true，否则返回false
+ */
+function validateLHSHWithBestCH(bestCHValues, bestLHValues, bestSHValues, ringNumber, judgeName) {
+    // 过滤掉空值和void
+    const nonEmptyBestCH = bestCHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+    const nonEmptyBestLH = bestLHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+    const nonEmptyBestSH = bestSHValues.filter(v => v.value && v.value.toLowerCase() !== 'void');
+    
+    // 如果Best CH系列为空，则Best LH CH和Best SH CH也应该为空
+    if (nonEmptyBestCH.length === 0) {
+        if (nonEmptyBestLH.length > 0) {
+            switchTab('championship');
+            alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，Best CH系列为空，但Best LH CH系列有猫编号。如果没有Best CH猫，也不应该有Best LH CH猫。`);
+            highlightElement(nonEmptyBestLH[0].element);
+            return false;
+        }
+        
+        if (nonEmptyBestSH.length > 0) {
+            switchTab('championship');
+            alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，Best CH系列为空，但Best SH CH系列有猫编号。如果没有Best CH猫，也不应该有Best SH CH猫。`);
+            highlightElement(nonEmptyBestSH[0].element);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // 获取Best CH系列中的猫编号
+    const bestCHNumbers = nonEmptyBestCH.map(v => v.value);
+    
+    // 验证Best LH CH和Best SH CH的并集必须包含所有Best CH的编号
+    const bestLHNumbers = nonEmptyBestLH.map(v => v.value);
+    const bestSHNumbers = nonEmptyBestSH.map(v => v.value);
+    const combinedLHSHNumbers = [...new Set([...bestLHNumbers, ...bestSHNumbers])];
+    
+    // 检查是否所有Best CH编号都出现在Best LH CH或Best SH CH中
+    const missingNumbers = bestCHNumbers.filter(num => !combinedLHSHNumbers.includes(num));
+    if (missingNumbers.length > 0) {
+        switchTab('championship');
+        alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，以下猫编号出现在Best CH系列中，但没有出现在Best LH CH或Best SH CH系列中：${missingNumbers.join(', ')}。所有Best CH中的猫必须出现在Best LH CH或Best SH CH中的一个系列中。`);
+        return false;
+    }
+    
+    // 检查是否有编号同时出现在Best LH CH和Best SH CH中
+    const duplicateNumbers = bestLHNumbers.filter(num => bestSHNumbers.includes(num));
+    if (duplicateNumbers.length > 0) {
+        switchTab('championship');
+        alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，以下猫编号同时出现在Best LH CH和Best SH CH系列中：${duplicateNumbers.join(', ')}。每个猫只能出现在其中一个系列中。`);
+        return false;
+    }
+    
+    // 验证Best LH CH中的顺序与它们在Best CH中的顺序一致
+    const bestCHPositions = {};
+    bestCHNumbers.forEach((num, index) => {
+        bestCHPositions[num] = index;
+    });
+    
+    // 提取Best LH CH中也出现在Best CH中的编号
+    const lhInBestCH = bestLHNumbers.filter(num => bestCHNumbers.includes(num));
+    
+    // 检查这些编号的顺序是否与它们在Best CH中的顺序一致
+    for (let i = 0; i < lhInBestCH.length - 1; i++) {
+        const currentPos = bestCHPositions[lhInBestCH[i]];
+        const nextPos = bestCHPositions[lhInBestCH[i + 1]];
+        
+        if (currentPos > nextPos) {
+            switchTab('championship');
+            alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，Best LH CH系列中的猫编号${lhInBestCH[i]}和${lhInBestCH[i + 1]}的顺序与它们在Best CH系列中的顺序不一致。`);
+            return false;
+        }
+    }
+    
+    // 验证Best SH CH中的顺序与它们在Best CH中的顺序一致
+    const shInBestCH = bestSHNumbers.filter(num => bestCHNumbers.includes(num));
+    
+    // 检查这些编号的顺序是否与它们在Best CH中的顺序一致
+    for (let i = 0; i < shInBestCH.length - 1; i++) {
+        const currentPos = bestCHPositions[shInBestCH[i]];
+        const nextPos = bestCHPositions[shInBestCH[i + 1]];
+        
+        if (currentPos > nextPos) {
+            switchTab('championship');
+            alert(`在Ring #${ringNumber}（裁判: ${judgeName}）中，Best SH CH系列中的猫编号${shInBestCH[i]}和${shInBestCH[i + 1]}的顺序与它们在Best CH系列中的顺序不一致。`);
+            return false;
+        }
+    }
+    
+    return true;
 }
